@@ -1,0 +1,32 @@
+plugins {
+    // Apply the groovy plugin to add support for Groovy
+    id 'dev.gradleplugins.groovy-gradle-plugin'
+}
+
+repositories {
+    // Use jcenter for resolving dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+repositories {
+    maven { url = uri("https://dl.bintray.com/gradle-plugins/distributions") }
+}
+
+dependencies {
+    // Use the latest Groovy version for building this library
+    implementation 'org.codehaus.groovy:groovy-all:2.5.8'
+        compileOnly 'dev.gradleplugins:gradle-api:2.14.1'
+
+    // Use the awesome Spock testing and specification framework
+    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
+}
+
+
+gradlePlugin {
+    plugins {
+        pomDslPlugin {
+            id = 'dev.nokee.pom-dsl'
+            implementationClass = 'dev.nokee.dsl.pom.internal.plugins.ProjectObjectModelDslPlugin'
+        }
+    }
+}
