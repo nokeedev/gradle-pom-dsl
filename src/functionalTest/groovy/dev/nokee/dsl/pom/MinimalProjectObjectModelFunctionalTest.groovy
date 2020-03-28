@@ -38,4 +38,26 @@ class MinimalProjectObjectModelFunctionalTest extends AbstractFunctionalSpec {
 		expect:
 		succeeds('verify')
 	}
+
+	def "can configure the description from the pom.xml"() {
+		pomFile << """
+			<project>
+				<modelVersion>4.0.0</modelVersion>
+				<groupId>com.mycompany.app</groupId>
+				<artifactId>my-app</artifactId>
+				<version>1</version>
+				<name>Some description</name>
+			</project>
+		"""
+		buildFile << """
+			tasks.register('verify') {
+				doLast {
+					assert project.description == 'Some description'
+				}
+			}
+		"""
+
+		expect:
+		succeeds('verify')
+	}
 }

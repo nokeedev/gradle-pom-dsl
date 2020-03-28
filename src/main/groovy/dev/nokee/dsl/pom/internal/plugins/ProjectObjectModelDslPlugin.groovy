@@ -11,6 +11,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 		settings.gradle.rootProject {
 			it.group = pom.groupId
 			it.version = pom.version
+			it.description = pom.name
 		}
     }
 }
