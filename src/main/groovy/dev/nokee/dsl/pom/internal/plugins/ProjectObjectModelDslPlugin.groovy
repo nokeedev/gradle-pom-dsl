@@ -27,6 +27,33 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				it.logger.lifecycle("Project '${it.path}' use an unsupported packaging (i.e. ${pom.packaging}), future version may support it.")
 			}
 
+			if (it.pluginManager.hasPlugin('java-base')) {
+				it.repositories.mavenCentral()
+			}
+
+			pom.dependencies.each { dep ->
+				def configurationName = null
+				if (dep.scope == 'compile') {
+					configurationName = 'compile'
+				} else if (dep.scope == 'runtime') {
+					configurationName = 'runtimeOnly'
+				} else if (dep.scope == 'provided') {
+					configurationName = 'compileOnly'
+				} else if (dep.scope == 'test') {
+					configurationName = 'testImplementation'
+				} else {
+					it.logger.lifecycle("Project '${it.path}' use an unsupported dependency scope (i.e. ${dep.groupId}:${dep.artifactId}:${dep.version} for ${dep.scope})")
+					return
+				}
+
+				def notation = [group: dep.groupId, name: dep.artifactId, version: dep.version, ext: dep.type, classifier: dep.classifier]
+				it.dependencies.add(configurationName, notation) { d ->
+					dep.exclusions.each { exclusion ->
+						d.exclude([group: exclusion.groupId, module: exclusion.artifactId])
+					}
+				}
+			}
+
 			pom.getUnsupportedTags().each { tag ->
 				it.logger.lifecycle("Project '${it.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
 			}

@@ -15,13 +15,17 @@ repositories {
 dependencies {
     // Use the latest Groovy version for building this library
     implementation 'org.codehaus.groovy:groovy-all:2.5.8'
-        compileOnly 'dev.gradleplugins:gradle-api:2.14.1'
+	compileOnly 'dev.gradleplugins:gradle-api:6.2.2'
 
 	testImplementation('dev.gradleplugins:gradle-fixtures:latest.integration') {
 		capabilities {
 			requireCapability('dev.gradleplugins:gradle-fixtures-spock-support')
 		}
 	}
+
+	// TODO: Should be coming from gradle-fixtures
+	functionalTestImplementation 'com.google.guava:guava:28.2-jre'
+	functionalTestImplementation 'org.apache.ant:ant:1.9.13'
 
     // Use the awesome Spock testing and specification framework
     testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'

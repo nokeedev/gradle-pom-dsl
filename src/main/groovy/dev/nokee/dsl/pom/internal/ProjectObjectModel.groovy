@@ -2,6 +2,8 @@ package dev.nokee.dsl.pom.internal
 
 import groovy.util.slurpersupport.GPathResult
 
+import static java.util.Collections.emptyList
+
 class ProjectObjectModel {
 	private final ProjectObjectModelFile pomFile
 	private final GPathResult pom
@@ -25,10 +27,13 @@ class ProjectObjectModel {
 		return pom.packaging
 	}
 
+	List<ProjectObjectModelDependency> getDependencies() {
+		return pom.dependencies.children().collect { new ProjectObjectModelDependency(it) }
+	}
+
 	private static final List<String> UNSUPPORTED_TAGS = [
 		// The basic
 		'parent',
-		'dependencies',
 		'dependencyManagement',
 		'modules',
 		'properties',
