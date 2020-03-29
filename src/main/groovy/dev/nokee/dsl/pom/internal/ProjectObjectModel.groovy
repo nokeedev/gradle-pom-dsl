@@ -18,6 +18,13 @@ class ProjectObjectModel {
 		return pom.artifactId
 	}
 
+	String getPackaging() {
+		if (pom.packaging.size() == 0) {
+			return 'jar'
+		}
+		return pom.packaging
+	}
+
 	def propertyMissing(String name) {
 		return pom."$name"
 	}

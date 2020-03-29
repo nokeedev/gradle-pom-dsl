@@ -14,6 +14,18 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 			it.group = pom.groupId
 			it.version = pom.version
 			it.description = pom.name
+
+			if (pom.packaging == 'war') {
+				it.pluginManager.apply('war')
+			} else if (pom.packaging == 'jar') {
+				it.pluginManager.apply('java')
+			} else if (pom.packaging == 'ear') {
+				it.pluginManager.apply('ear')
+			} else if (pom.packaging == 'pom') {
+				// ignore pom packaging
+			} else {
+				it.logger.lifecycle("Project '${it.path}' has an unsupported packaging (i.e. ${pom.packaging}), future version may support them.")
+			}
 		}
     }
 }
