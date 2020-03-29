@@ -24,7 +24,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 			} else if (pom.packaging == 'pom') {
 				// ignore pom packaging
 			} else {
-				it.logger.lifecycle("Project '${it.path}' has an unsupported packaging (i.e. ${pom.packaging}), future version may support them.")
+				it.logger.lifecycle("Project '${it.path}' use an unsupported packaging (i.e. ${pom.packaging}), future version may support it.")
 			}
 		}
     }

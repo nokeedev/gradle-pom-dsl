@@ -28,7 +28,7 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 
 		expect:
 		succeeds('verify')
-		!result.output.contains("Project ':' has an unsupported packaging")
+		!result.output.contains("Project ':' use an unsupported packaging")
 	}
 
 	def "applies the core java plugin for packaging jar"() {
@@ -45,7 +45,7 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 
 		expect:
 		succeeds('verify')
-		!result.output.contains("Project ':' has an unsupported packaging")
+		!result.output.contains("Project ':' use an unsupported packaging")
 	}
 
 	def "applies the core ear plugin for packaging ear"() {
@@ -62,7 +62,7 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 
 		expect:
 		succeeds('verify')
-		!result.output.contains("Project ':' has an unsupported packaging")
+		!result.output.contains("Project ':' use an unsupported packaging")
 	}
 
 	def "does not applies any plugin for packaging pom"() {
@@ -79,7 +79,7 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 
 		expect:
 		succeeds('verify')
-		!result.output.contains("Project ':' has an unsupported packaging")
+		!result.output.contains("Project ':' use an unsupported packaging")
 	}
 
 	def "applies the core java plugin when no packaging"() {
@@ -103,7 +103,7 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 
 		expect:
 		succeeds('verify')
-		!result.output.contains("Project ':' has an unsupported packaging")
+		!result.output.contains("Project ':' use an unsupported packaging")
 	}
 
 	@Unroll
@@ -120,7 +120,7 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 
 		expect:
 		succeeds('verify')
-		result.assertOutputContains("Project ':' has an unsupported packaging (i.e. ${unsupportedPackaging}), future version may support them.")
+		result.assertOutputContains("Project ':' use an unsupported packaging (i.e. ${unsupportedPackaging}), future version may support it.")
 
 		where:
 		unsupportedPackaging << ['maven-plugin', 'ejb', 'rar']
