@@ -1,7 +1,7 @@
 package dev.nokee.dsl.pom
 
 class ProjectObjectModelPropertiesFunctionalTest extends AbstractProjectObjectModelFunctionalSpec {
-	def "can configure the group, name and version from the pom.xml"() {
+	def "maps pom.xml properties to extra properties"() {
 		pomFile << """
 			<project>
 				<modelVersion>4.0.0</modelVersion>
@@ -27,4 +27,27 @@ class ProjectObjectModelPropertiesFunctionalTest extends AbstractProjectObjectMo
 		expect:
 		succeeds('verify')
 	}
+
+	def "maps groupId and artifactId of pom.xml to extra properties"() {
+		pomFile << """
+			<project>
+				<modelVersion>4.0.0</modelVersion>
+				<groupId>com.mycompany.app</groupId>
+				<artifactId>my-app</artifactId>
+				<version>1</version>
+			</project>
+		"""
+		buildFile << """
+			tasks.register('verify') {
+				doLast {
+					assert project.property('groupId') == 'com.mycompany.app'
+					assert project.property('artifactId') == 'my-app'
+				}
+			}
+		"""
+
+		expect:
+		succeeds('verify')
+	}
+
 }

@@ -14,20 +14,8 @@ class UnsupportedProjectObjectModelTagFunctionalTest extends AbstractProjectObje
 			'build',
 			'reporting',
 
-			// More Project Information
-			'name',
-			'url',
-			'inceptionYear',
-			'licenses',
-			'organization',
-			'developers',
-			'contributors',
-
 			// Environment Settings
 			'issueManagement',
-			'ciManagement',
-			'mailingLists',
-			'scm',
 			'prerequisites',
 			'repositories',
 			'pluginRepositories',
@@ -52,6 +40,48 @@ class UnsupportedProjectObjectModelTagFunctionalTest extends AbstractProjectObje
 
 		where:
 		unsupportedTag << unsupportedTags
+	}
+
+	protected static List<String> getSupportedTags() {
+		return [
+			// The basic
+			'groupId',
+			'description',
+			'packaging',
+			'version',
+
+			// More Project Information
+			'name',
+			'url',
+			'inceptionYear',
+			'licenses',
+			'organization',
+			'developers',
+			'contributors',
+
+			// Environment Settings
+			'ciManagement',
+			'mailingLists',
+			'scm',
+		]
+	}
+
+	@Unroll
+	def "does not shows warning for supported tag [#supportedTag]"(supportedTag) {
+		pomFile << """
+			<project>
+				<modelVersion>4.0.0</modelVersion>
+				<artifactId>my-app</artifactId>
+				<${supportedTag}>...</${supportedTag}>
+			</project>
+		"""
+
+		expect:
+		succeeds('help')
+		!result.output.contains("Project ':' use an unsupported tag (i.e. ${supportedTag})")
+
+		where:
+		supportedTag << supportedTags
 	}
 
 	def "does not show warning when unsupported tags aren't present"() {

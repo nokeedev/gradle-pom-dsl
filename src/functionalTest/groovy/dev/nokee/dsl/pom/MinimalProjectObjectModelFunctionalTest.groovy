@@ -1,8 +1,5 @@
 package dev.nokee.dsl.pom
 
-
-import dev.gradleplugins.test.fixtures.file.TestFile
-
 class MinimalProjectObjectModelFunctionalTest extends AbstractProjectObjectModelFunctionalSpec {
 	def "can configure the group, name and version from the pom.xml"() {
 		pomFile << """

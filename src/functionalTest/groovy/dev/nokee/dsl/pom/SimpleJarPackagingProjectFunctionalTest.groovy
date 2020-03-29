@@ -84,7 +84,7 @@ class SimpleJarPackagingProjectFunctionalTest extends AbstractProjectObjectModel
 
 		when:
 		file('build/libs/gs-maven.jar').assertDoesNotExist()
-		succeeds('assemble')
+		succeeds('assemble', '-s')
 		then:
 		new JarTestFixture(file('build/libs/gs-maven-0.1.0.jar')).hasDescendants('hello/HelloWorld.class', 'hello/Greeter.class')
 	}
