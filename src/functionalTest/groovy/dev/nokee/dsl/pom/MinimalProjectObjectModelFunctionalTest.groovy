@@ -34,7 +34,7 @@ class MinimalProjectObjectModelFunctionalTest extends AbstractProjectObjectModel
 				<groupId>com.mycompany.app</groupId>
 				<artifactId>my-app</artifactId>
 				<version>1</version>
-				<name>Some description</name>
+				<description>Some description</description>
 			</project>
 		"""
 		buildFile << """

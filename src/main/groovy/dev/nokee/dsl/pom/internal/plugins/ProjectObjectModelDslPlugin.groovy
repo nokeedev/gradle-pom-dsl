@@ -13,7 +13,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 		settings.gradle.rootProject { project ->
 			project.group = pom.groupId
 			project.version = pom.version
-			project.description = pom.name
+			project.description = pom.description
 
 			if (pom.packaging == 'war') {
 				project.pluginManager.apply('war')

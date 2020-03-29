@@ -46,7 +46,7 @@ class ProjectObjectModel {
 		'reporting',
 
 		// More Project Information
-		'description',
+		'name',
 		'url',
 		'inceptionYear',
 		'licenses',

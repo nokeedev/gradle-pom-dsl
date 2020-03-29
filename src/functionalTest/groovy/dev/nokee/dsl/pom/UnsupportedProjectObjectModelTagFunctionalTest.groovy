@@ -15,7 +15,7 @@ class UnsupportedProjectObjectModelTagFunctionalTest extends AbstractProjectObje
 			'reporting',
 
 			// More Project Information
-			'description',
+			'name',
 			'url',
 			'inceptionYear',
 			'licenses',
