@@ -8,7 +8,6 @@ class UnsupportedProjectObjectModelTagFunctionalTest extends AbstractProjectObje
 			// The basic
 			'parent',
 			'dependencyManagement',
-			'modules',
 
 			// Build Settings
 			'build',

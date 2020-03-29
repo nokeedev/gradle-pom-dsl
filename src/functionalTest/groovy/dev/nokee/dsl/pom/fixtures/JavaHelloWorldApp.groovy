@@ -1,5 +1,6 @@
 package dev.nokee.dsl.pom.fixtures
 
+import dev.gradleplugins.test.fixtures.file.TestFile
 import dev.gradleplugins.test.fixtures.sources.SourceElement
 import dev.gradleplugins.test.fixtures.sources.SourceFile
 import dev.gradleplugins.test.fixtures.sources.SourceFileElement
@@ -81,6 +82,21 @@ public class GreeterTest {
 
 }
 '''))
+			}
+		}
+	}
+
+	SourceElement withLibraryAsModule(String path) {
+		return new SourceElement() {
+			@Override
+			List<SourceFile> getFiles() {
+				throw new UnsupportedOperationException()
+			}
+
+			@Override
+			void writeToProject(TestFile projectDir) {
+				helloWorld.writeToProject(projectDir)
+				greeter.writeToProject(projectDir.file(path))
 			}
 		}
 	}

@@ -14,6 +14,10 @@ class ProjectObjectModel {
 		this.pom = new XmlOptionalWrapper(pom)
 	}
 
+	ProjectObjectModelFile getFile() {
+		return pomFile
+	}
+
 	String getArtifactId() {
 		return pom.getAsString('artifactId').orElseThrow { new IllegalStateException("${pomFile.path} file doesn't have an artifactId tag.") }
 	}
@@ -42,6 +46,10 @@ class ProjectObjectModel {
 		return pom.getAsNode(name)
 	}
 
+	List<ProjectObjectModel> getModules() {
+		return pom.getAsNode('modules').map { it.children().collect { of(pomFile.module(it.text())) } }.orElse(emptyList())
+	}
+
 	List<Dependency> getDependencies() {
 		return pom.get('dependencies').map { it.children().collect { n -> new Dependency(n) } }.orElse(emptyList())
 	}
@@ -50,7 +58,6 @@ class ProjectObjectModel {
 		// The basic
 		'parent',
 		'dependencyManagement',
-		'modules',
 
 		// Build Settings
 		'build',
