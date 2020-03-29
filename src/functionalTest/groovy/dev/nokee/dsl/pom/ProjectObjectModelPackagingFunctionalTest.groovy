@@ -125,4 +125,22 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 		where:
 		unsupportedPackaging << ['maven-plugin', 'ejb', 'rar']
 	}
+
+	@Unroll
+	def "always apply maven-publish plugin [#packaging]"(packaging) {
+		makeSingleProject(packaging)
+		buildFile << """
+			tasks.register('verify') {
+				doLast {
+					assert pluginManager.hasPlugin('maven-publish')
+				}
+			}
+		"""
+
+		expect:
+		succeeds('verify')
+
+		where:
+		packaging << ['maven-plugin', 'ejb', 'rar', 'ear', 'pom', 'jar', 'war']
+	}
 }
