@@ -27,8 +27,8 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				it.logger.lifecycle("Project '${it.path}' use an unsupported packaging (i.e. ${pom.packaging}), future version may support it.")
 			}
 
-			if (pom.hasBuildTag()) {
-				it.logger.lifecycle("Project '${it.path}' use an unsupported tag (i.e. build), future version may support it.")
+			pom.getUnsupportedTags().each { tag ->
+				it.logger.lifecycle("Project '${it.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
 			}
 		}
     }

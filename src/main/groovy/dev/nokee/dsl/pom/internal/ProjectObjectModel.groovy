@@ -25,11 +25,40 @@ class ProjectObjectModel {
 		return pom.packaging
 	}
 
-	boolean hasBuildTag() {
-		if (pom.build.size() == 0) {
-			return false
-		}
-		return true
+	private static final List<String> UNSUPPORTED_TAGS = [
+		// The basic
+		'parent',
+		'dependencies',
+		'dependencyManagement',
+		'modules',
+		'properties',
+
+		// Build Settings
+		'build',
+		'reporting',
+
+		// More Project Information
+		'description',
+		'url',
+		'inceptionYear',
+		'licenses',
+		'organization',
+		'developers',
+		'contributors',
+
+		// Environment Settings
+		'issueManagement',
+		'ciManagement',
+		'mailingLists',
+		'scm',
+		'prerequisites',
+		'repositories',
+		'pluginRepositories',
+		'distributionManagement',
+		'profiles'
+	]
+	List<String> getUnsupportedTags() {
+		return pom.children().findAll { UNSUPPORTED_TAGS.contains(it.name()) }*.name()
 	}
 
 	def propertyMissing(String name) {
