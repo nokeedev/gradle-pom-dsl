@@ -48,4 +48,18 @@ class MinimalProjectObjectModelFunctionalTest extends AbstractProjectObjectModel
 		expect:
 		succeeds('verify')
 	}
+
+	def "throws an exception when artifactId tag"() {
+		pomFile << """
+			<project>
+				<modelVersion>4.0.0</modelVersion>
+			</project>
+		"""
+
+		expect:
+		fails('verify')
+		failure.assertHasDescription("An exception occurred applying plugin request [id: 'dev.nokee.pom-dsl']")
+		failure.assertHasCause("Failed to apply plugin [id 'dev.nokee.pom-dsl']")
+		failure.assertHasCause("pom.xml file doesn't have an artifactId tag.")
+	}
 }
