@@ -10,25 +10,25 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
     void apply(Settings settings) {
 		def pom = ProjectObjectModel.of(new ProjectObjectModelFile(settings.settingsDir, 'pom.xml'))
 		settings.rootProject.name = pom.artifactId
-		settings.gradle.rootProject {
-			it.group = pom.groupId
-			it.version = pom.version
-			it.description = pom.name
+		settings.gradle.rootProject { project ->
+			project.group = pom.groupId
+			project.version = pom.version
+			project.description = pom.name
 
 			if (pom.packaging == 'war') {
-				it.pluginManager.apply('war')
+				project.pluginManager.apply('war')
 			} else if (pom.packaging == 'jar') {
-				it.pluginManager.apply('java')
+				project.pluginManager.apply('java')
 			} else if (pom.packaging == 'ear') {
-				it.pluginManager.apply('ear')
+				project.pluginManager.apply('ear')
 			} else if (pom.packaging == 'pom') {
 				// ignore pom packaging
 			} else {
-				it.logger.lifecycle("Project '${it.path}' use an unsupported packaging (i.e. ${pom.packaging}), future version may support it.")
+				project.logger.lifecycle("Project '${project.path}' use an unsupported packaging (i.e. ${pom.packaging}), future version may support it.")
 			}
 
-			if (it.pluginManager.hasPlugin('java-base')) {
-				it.repositories.mavenCentral()
+			if (project.pluginManager.hasPlugin('java-base')) {
+				project.repositories.mavenCentral()
 			}
 
 			pom.dependencies.each { dep ->
@@ -42,12 +42,12 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				} else if (dep.scope == 'test') {
 					configurationName = 'testImplementation'
 				} else {
-					it.logger.lifecycle("Project '${it.path}' use an unsupported dependency scope (i.e. ${dep.groupId}:${dep.artifactId}:${dep.version} for ${dep.scope})")
+					project.logger.lifecycle("Project '${project.path}' use an unsupported dependency scope (i.e. ${dep.groupId}:${dep.artifactId}:${dep.version} for ${dep.scope})")
 					return
 				}
 
-				def notation = [group: dep.groupId, name: dep.artifactId, version: dep.version, ext: dep.type, classifier: dep.classifier]
-				it.dependencies.add(configurationName, notation) { d ->
+				def notation = [group: dep.groupId, name: dep.artifactId, version: dep.version, classifier: dep.classifier]
+				project.dependencies.add(configurationName, notation) { d ->
 					dep.exclusions.each { exclusion ->
 						d.exclude([group: exclusion.groupId, module: exclusion.artifactId])
 					}
@@ -55,7 +55,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 			}
 
 			pom.getUnsupportedTags().each { tag ->
-				it.logger.lifecycle("Project '${it.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
+				project.logger.lifecycle("Project '${project.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
 			}
 		}
     }

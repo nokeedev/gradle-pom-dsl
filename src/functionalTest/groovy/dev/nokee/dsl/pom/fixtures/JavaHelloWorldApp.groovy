@@ -12,6 +12,7 @@ class JavaHelloWorldApp extends JavaSourceElement {
 	SourceFileElement helloWorld
 	SourceFileElement helloWorldWithDependency
 	SourceFileElement greeter
+	JavaSourceElement greeterTest
 
 	@Override
 	SourceElement getSources() {
@@ -52,6 +53,36 @@ public class HelloWorld {
   }
 }
 '''))
+		greeterTest = new JavaSourceElement() {
+
+			@Override
+			String getSourceSetName() {
+				return 'test'
+			}
+
+			@Override
+			SourceElement getSources() {
+				return ofFile(sourceFile('java/hello', 'GreeterTest.java', '''
+package hello;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class GreeterTest {
+
+  private Greeter greeter = new Greeter();
+
+  @Test
+  public void greeterSaysHello() {
+    assertThat(greeter.sayHello(), containsString("Hello"));
+  }
+
+}
+'''))
+			}
+		}
 	}
 
 	JavaSourceElement withExternalDependency() {
@@ -61,5 +92,9 @@ public class HelloWorld {
 				return ofElements(helloWorldWithDependency, greeter)
 			}
 		}
+	}
+
+	SourceElement withJUnitTest() {
+		return ofElements(helloWorld, greeter, greeterTest)
 	}
 }

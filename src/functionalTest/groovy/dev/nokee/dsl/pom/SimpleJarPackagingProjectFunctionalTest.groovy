@@ -40,6 +40,29 @@ class SimpleJarPackagingProjectFunctionalTest extends AbstractProjectObjectModel
 		"""
 	}
 
+	protected void makeSingleProjectWithJUnitTest() {
+		pomFile << """<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.springframework</groupId>
+    <artifactId>gs-maven</artifactId>
+    <packaging>jar</packaging>
+    <version>0.1.0</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
+		"""
+	}
+
 	JavaHelloWorldApp getComponentUnderTest() {
 		return new JavaHelloWorldApp()
 	}
@@ -64,5 +87,16 @@ class SimpleJarPackagingProjectFunctionalTest extends AbstractProjectObjectModel
 		succeeds('assemble')
 		then:
 		new JarTestFixture(file('build/libs/gs-maven-0.1.0.jar')).hasDescendants('hello/HelloWorld.class', 'hello/Greeter.class')
+	}
+
+	def "can check jar packaging project using pom.xml DSL with JUnit tests"() {
+		makeSingleProjectWithJUnitTest()
+		componentUnderTest.withJUnitTest().writeToProject(testDirectory)
+
+		when:
+		file('build/reports/tests/test').assertDoesNotExist()
+		succeeds('check')
+		then:
+		file('build/reports/tests/test').assertExists()
 	}
 }
