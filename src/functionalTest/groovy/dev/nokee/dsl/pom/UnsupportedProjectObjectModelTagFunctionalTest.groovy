@@ -15,7 +15,6 @@ class UnsupportedProjectObjectModelTagFunctionalTest extends AbstractProjectObje
 			'reporting',
 
 			// Environment Settings
-			'issueManagement',
 			'prerequisites',
 			'repositories',
 			'pluginRepositories',
@@ -60,6 +59,7 @@ class UnsupportedProjectObjectModelTagFunctionalTest extends AbstractProjectObje
 			'contributors',
 
 			// Environment Settings
+			'issueManagement',
 			'ciManagement',
 			'mailingLists',
 			'scm',

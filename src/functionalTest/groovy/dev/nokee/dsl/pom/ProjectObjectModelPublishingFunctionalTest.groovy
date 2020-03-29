@@ -438,6 +438,36 @@ class ProjectObjectModelPublishingFunctionalTest extends AbstractProjectObjectMo
 		!pomContent.contains('<licenses />')
 	}
 
+	def "handles the issueManagement tag when publishing"() {
+		componentUnderTest.writeToProject(testDirectory)
+
+		when:
+		makeSingleProject([issueManagement: [url: 'https://example.com/']])
+		succeeds('generatePomFileForMavenPublication')
+		then:
+		pomContent.contains('<issueManagement><url>https://example.com/</url></issueManagement>')
+
+		when:
+		makeSingleProject([issueManagement: [system: 'Foo bar']])
+		succeeds('generatePomFileForMavenPublication')
+		then:
+		pomContent.contains('<issueManagement><system>Foo bar</system></issueManagement>')
+
+		when:
+		makeSingleProject([issueManagement: [:]])
+		succeeds('generatePomFileForMavenPublication')
+		then:
+		!pomContent.contains('<issueManagement>')
+		!pomContent.contains('<issueManagement />')
+
+		when:
+		makeSingleProject([:])
+		succeeds('generatePomFileForMavenPublication')
+		then:
+		!pomContent.contains('<issueManagement>')
+		!pomContent.contains('<issueManagement />')
+	}
+
 	protected String getPomContent() {
 		return file('build/publications/maven/pom-default.xml').assertExists().readLines()*.trim().join('')
 	}

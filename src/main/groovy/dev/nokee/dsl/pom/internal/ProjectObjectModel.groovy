@@ -43,10 +43,7 @@ class ProjectObjectModel {
 	}
 
 	List<Dependency> getDependencies() {
-		return pom.get('dependencies').map { it ->
-			println it.children()
-			it.children().collect { n -> new Dependency(n) }
-		}.orElse(emptyList())
+		return pom.get('dependencies').map { it.children().collect { n -> new Dependency(n) } }.orElse(emptyList())
 	}
 
 	private static final List<String> UNSUPPORTED_TAGS = [
@@ -60,7 +57,6 @@ class ProjectObjectModel {
 		'reporting',
 
 		// Environment Settings
-		'issueManagement',
 		'prerequisites',
 		'repositories',
 		'pluginRepositories',
@@ -129,7 +125,6 @@ class ProjectObjectModel {
 		private final XmlOptionalWrapper delegate
 
 		Dependency(Node delegate) {
-			println delegate
 			this.delegate = new XmlOptionalWrapper(delegate)
 		}
 
