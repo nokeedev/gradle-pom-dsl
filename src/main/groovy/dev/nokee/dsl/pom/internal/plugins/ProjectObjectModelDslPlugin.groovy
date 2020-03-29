@@ -49,6 +49,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				pom.getNode('developers').ifPresent { xmlProvider.asNode().append(it) }
 				pom.getNode('licenses').ifPresent { xmlProvider.asNode().append(it) }
 				pom.getNode('issueManagement').ifPresent { xmlProvider.asNode().append(it) }
+				pom.getNode('properties').ifPresent {xmlProvider.asNode().append(it) }
 			}
 		}
 	}
@@ -60,8 +61,9 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 		return Optional.empty()
 	}
 
-	private Action<Project> configureProject(ProjectObjectModel pom, Map<String, String> notationToProjectMapping) {
+	private Action<Project> configureProject(ProjectObjectModel unattachedPom, Map<String, String> notationToProjectMapping) {
 		return { project ->
+			ProjectObjectModel pom = unattachedPom.attach(project)
 			// Configure basic information
 			pom.groupId.ifPresent {
 				project.ext.groupId = it

@@ -1,17 +1,32 @@
 package dev.nokee.dsl.pom.internal
 
+import groovy.text.SimpleTemplateEngine
+import groovy.xml.QName
+import org.gradle.api.Project
+
 import javax.annotation.Nullable
 
 import static java.util.Collections.emptyList
 import static java.util.Collections.emptyMap
 
 class ProjectObjectModel {
+	private final SimpleTemplateEngine engine = new SimpleTemplateEngine()
 	private final ProjectObjectModelFile pomFile
 	private final XmlOptionalWrapper pom
+	private final Project project
 
 	private ProjectObjectModel(ProjectObjectModelFile pomFile, Node pom) {
+		this(pomFile, pom, null)
+	}
+
+	private ProjectObjectModel(ProjectObjectModelFile pomFile, Node pom, Project project) {
 		this.pomFile = pomFile
 		this.pom = new XmlOptionalWrapper(pom)
+		this.project = project
+	}
+
+	ProjectObjectModel attach(Project project) {
+		return new ProjectObjectModel(pomFile, pom.delegate, project)
 	}
 
 	ProjectObjectModelFile getFile() {
@@ -51,7 +66,7 @@ class ProjectObjectModel {
 	}
 
 	List<Dependency> getDependencies() {
-		return pom.get('dependencies').map { it.children().collect { n -> new Dependency(n) } }.orElse(emptyList())
+		return pom.get('dependencies').map { it.children().collect { n -> new Dependency(new XmlOptionalWrapper(n)) } }.orElse(emptyList())
 	}
 
 	private static final List<String> UNSUPPORTED_TAGS = [
@@ -100,7 +115,7 @@ class ProjectObjectModel {
 	}
 
 
-	static class XmlOptionalWrapper {
+	class XmlOptionalWrapper {
 		private final Node delegate
 
 		XmlOptionalWrapper(Node delegate) {
@@ -112,11 +127,18 @@ class ProjectObjectModel {
 		}
 
 		Optional<String> getAsString(String name) {
-			return get(name).map { it.text() }
+			return get(name).map { toString(it.text()) }
 		}
 
 		Map<String, String> getAsMap(String name) {
-			return get(name).map { it.children().collectEntries { ["${it.name()}": it.text()] }}.orElse(emptyMap())
+			return get(name).map { it.children().collectEntries { ["${getName(it)}": it.text()] }}.orElse(emptyMap())
+		}
+
+		private String getName(Node node) {
+			if (node.name() instanceof QName) {
+				return node.name().localPart
+			}
+			return node.name()
 		}
 
 		List<String> getAsList(String name) {
@@ -126,13 +148,20 @@ class ProjectObjectModel {
 		Optional<Node> getAsNode(String name) {
 			return get(name).map { it }
 		}
+
+		private String toString(String value) {
+			ProjectObjectModel.this.getProperties().each { k, v ->
+				value = value.replace("\${$k}", v)
+			}
+			return ProjectObjectModel.this.engine.createTemplate(value).make([project: ProjectObjectModel.this.project])
+		}
 	}
 
 	class Dependency {
 		private final XmlOptionalWrapper delegate
 
-		Dependency(Node delegate) {
-			this.delegate = new XmlOptionalWrapper(delegate)
+		Dependency(XmlOptionalWrapper delegate) {
+			this.delegate = delegate
 		}
 
 		String getScope() {
@@ -161,14 +190,14 @@ class ProjectObjectModel {
 		}
 
 		List<Exclusion> getExclusions() {
-			return delegate.get('exclusions').map { it.children().collect { new Exclusion(it) } }.orElse(emptyList())
+			return delegate.get('exclusions').map { it.children().collect { new Exclusion(new XmlOptionalWrapper(it)) } }.orElse(emptyList())
 		}
 
 		static class Exclusion {
 			private final XmlOptionalWrapper delegate
 
 			Exclusion(XmlOptionalWrapper delegate) {
-				this.delegate = new XmlOptionalWrapper(delegate)
+				this.delegate = delegate
 			}
 
 			@Nullable
