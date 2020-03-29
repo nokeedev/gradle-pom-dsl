@@ -25,6 +25,13 @@ class ProjectObjectModel {
 		return pom.packaging
 	}
 
+	boolean hasBuildTag() {
+		if (pom.build.size() == 0) {
+			return false
+		}
+		return true
+	}
+
 	def propertyMissing(String name) {
 		return pom."$name"
 	}
