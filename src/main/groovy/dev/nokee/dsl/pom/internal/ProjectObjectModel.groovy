@@ -27,6 +27,10 @@ class ProjectObjectModel {
 		return pom.packaging
 	}
 
+	Map<String, String> getProperties() {
+		return pom.properties.children().collectEntries { ["${it.name()}": it] }
+	}
+
 	List<ProjectObjectModelDependency> getDependencies() {
 		return pom.dependencies.children().collect { new ProjectObjectModelDependency(it) }
 	}
@@ -36,7 +40,6 @@ class ProjectObjectModel {
 		'parent',
 		'dependencyManagement',
 		'modules',
-		'properties',
 
 		// Build Settings
 		'build',

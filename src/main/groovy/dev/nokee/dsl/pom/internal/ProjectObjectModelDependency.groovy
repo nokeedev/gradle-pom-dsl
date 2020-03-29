@@ -1,11 +1,8 @@
 package dev.nokee.dsl.pom.internal
 
-import groovy.transform.ToString;
 import groovy.util.slurpersupport.GPathResult
 
 import javax.annotation.Nullable
-
-import static java.util.Collections.emptyList;
 
 class ProjectObjectModelDependency {
 	private final GPathResult delegate

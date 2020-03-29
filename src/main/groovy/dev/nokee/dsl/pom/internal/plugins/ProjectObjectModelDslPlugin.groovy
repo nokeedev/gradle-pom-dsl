@@ -31,6 +31,10 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				project.repositories.mavenCentral()
 			}
 
+			pom.properties.each { k, v ->
+				project.ext."$k" = v
+			}
+
 			pom.dependencies.each { dep ->
 				def configurationName = null
 				if (dep.scope == 'compile') {
