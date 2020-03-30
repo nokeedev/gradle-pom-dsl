@@ -13,7 +13,7 @@ class ProjectObjectModelTest extends Specification {
 
 	def "throws exception when pom.xml file does not exists"() {
 		when:
-		ProjectObjectModel.of(new ProjectObjectModelFile(temporaryFolder.testDirectory, 'pom.xml'))
+		ProjectObjectModel.of(new ProjectObjectModelFile(temporaryFolder.testDirectory, 'pom.xml'), [:])
 		then:
 		def exception = thrown(IllegalArgumentException)
 		exception.message == "pom.xml file doesn't exists."

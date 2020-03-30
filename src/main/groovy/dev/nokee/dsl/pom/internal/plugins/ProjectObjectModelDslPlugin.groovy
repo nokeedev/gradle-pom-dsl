@@ -3,6 +3,7 @@ package dev.nokee.dsl.pom.internal.plugins
 import dev.nokee.dsl.pom.internal.ProjectObjectModel
 import dev.nokee.dsl.pom.internal.ProjectObjectModelFile
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.XmlProvider
@@ -13,16 +14,16 @@ import org.gradle.api.publish.maven.MavenPublication
 class ProjectObjectModelDslPlugin implements Plugin<Settings> {
     @Override
     void apply(Settings settings) {
-		def pom = ProjectObjectModel.of(new ProjectObjectModelFile(settings.settingsDir, 'pom.xml'))
+		def notationToProjectMapping = [:]
+		def pom = ProjectObjectModel.of(new ProjectObjectModelFile(settings.settingsDir, 'pom.xml'), notationToProjectMapping)
 		settings.rootProject.name = pom.artifactId
 
-		def notationToProjectMapping = [:]
 		processModules(settings, pom, notationToProjectMapping)
     }
 
-	private void processModules(Settings settings, ProjectObjectModel pom, Map<String, String> notationToProjectMapping) {
+	private void processModules(Settings settings, ProjectObjectModel pom, Map<String, ProjectObjectModel> notationToProjectMapping) {
 		toNotation(pom).ifPresent {
-			notationToProjectMapping.put(it, ":${pom.file.modulePath}")
+			notationToProjectMapping.put(it, pom)
 		}
 		pom.modules.each { childPom ->
 			settings.include(childPom.file.modulePath)
@@ -61,85 +62,89 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 		return Optional.empty()
 	}
 
-	private Action<Project> configureProject(ProjectObjectModel unattachedPom, Map<String, String> notationToProjectMapping) {
+	private Action<Project> configureProject(ProjectObjectModel unattachedPom, Map<String, ProjectObjectModel> notationToProjectMapping) {
 		return { project ->
-			ProjectObjectModel pom = unattachedPom.attach(project)
-			// Configure basic information
-			pom.groupId.ifPresent {
-				project.ext.groupId = it
-				project.group = it
-			}
-			project.ext.artifactId = project.name
-			pom.version.ifPresent { project.version = it }
-			pom.description.ifPresent { project.description = it }
-
-			// Always apply maven publishing plugin
-			project.pluginManager.apply('maven-publish')
-			project.extensions.configure(PublishingExtension) { publishing ->
-				publishing.publications.withType(MavenPublication).all { MavenPublication publication ->
-					publication.pom.withXml(copy(pom))
+			try {
+				ProjectObjectModel pom = unattachedPom.attach(project)
+				// Configure basic information
+				pom.groupId.ifPresent {
+					project.ext.groupId = it
+					project.group = it
 				}
-			}
+				project.ext.artifactId = project.name
+				pom.version.ifPresent { project.version = it }
+				pom.description.ifPresent { project.description = it }
 
-			// Apply plugins based on packaging
-			if (pom.packaging == 'war') {
-				project.pluginManager.apply('war')
-			} else if (pom.packaging == 'jar') {
-				project.pluginManager.apply('java')
+				// Always apply maven publishing plugin
+				project.pluginManager.apply('maven-publish')
 				project.extensions.configure(PublishingExtension) { publishing ->
-					publishing.publications.create('maven', MavenPublication) {
-						it.from(project.components.java)
+					publishing.publications.withType(MavenPublication).all { MavenPublication publication ->
+						publication.pom.withXml(copy(pom))
 					}
 				}
-			} else if (pom.packaging == 'ear') {
-				project.pluginManager.apply('ear')
-			} else if (pom.packaging == 'pom') {
-				// ignore pom packaging
-			} else {
-				project.logger.lifecycle("Project '${project.path}' use an unsupported packaging (i.e. ${pom.packaging}), future version may support it.")
-			}
 
-			// For java project, add the maven Central repository
-			if (project.pluginManager.hasPlugin('java-base')) {
-				project.repositories.mavenCentral()
-			}
-
-			// Map properties to extra properties
-			pom.properties.each { k, v ->
-				project.ext."$k" = v
-			}
-
-			// Map dependencies
-			pom.dependencies.each { dep ->
-				def configurationName = null
-				if (dep.scope == 'compile') {
-					configurationName = 'compile'
-				} else if (dep.scope == 'runtime') {
-					configurationName = 'runtimeOnly'
-				} else if (dep.scope == 'provided') {
-					configurationName = 'compileOnly'
-				} else if (dep.scope == 'test') {
-					configurationName = 'testImplementation'
+				// Apply plugins based on packaging
+				if (pom.packaging == 'war') {
+					project.pluginManager.apply('war')
+				} else if (pom.packaging == 'jar') {
+					project.pluginManager.apply('java')
+					project.extensions.configure(PublishingExtension) { publishing ->
+						publishing.publications.create('maven', MavenPublication) {
+							it.from(project.components.java)
+						}
+					}
+				} else if (pom.packaging == 'ear') {
+					project.pluginManager.apply('ear')
+				} else if (pom.packaging == 'pom') {
+					// ignore pom packaging
 				} else {
-					project.logger.lifecycle("Project '${project.path}' use an unsupported dependency scope (i.e. ${dep.groupId}:${dep.artifactId}:${dep.version} for ${dep.scope})")
-					return
+					project.logger.lifecycle("Project '${project.path}' use an unsupported packaging (i.e. ${pom.packaging}), future version may support it.")
 				}
 
-				def projectNotation = String.format("%s:%s", dep.groupId, dep.artifactId)
-				if (notationToProjectMapping.containsKey(projectNotation)) {
-					project.dependencies.add(configurationName, project.project(notationToProjectMapping.get(projectNotation)))
-				} else {
-					def notation = [group: dep.groupId, name: dep.artifactId, version: dep.version, classifier: dep.classifier]
-					project.dependencies.add(configurationName, notation) { d ->
-						dep.exclusions.each { exclusion ->
-							d.exclude([group: exclusion.groupId, module: exclusion.artifactId])
+				// For java project, add the maven Central repository
+				if (project.pluginManager.hasPlugin('java-base')) {
+					project.repositories.mavenCentral()
+				}
+
+				// Map properties to extra properties
+				pom.properties.each { k, v ->
+					project.ext."$k" = v
+				}
+
+				// Map dependencies
+				pom.dependencies.each { dep ->
+					def configurationName = null
+					if (dep.scope == 'compile') {
+						configurationName = 'compile'
+					} else if (dep.scope == 'runtime') {
+						configurationName = 'runtimeOnly'
+					} else if (dep.scope == 'provided') {
+						configurationName = 'compileOnly'
+					} else if (dep.scope == 'test') {
+						configurationName = 'testImplementation'
+					} else {
+						project.logger.lifecycle("Project '${project.path}' use an unsupported dependency scope (i.e. ${dep.groupId}:${dep.artifactId}:${dep.version} for ${dep.scope})")
+						return
+					}
+
+					def projectNotation = String.format("%s:%s", dep.groupId, dep.artifactId)
+					if (notationToProjectMapping.containsKey(projectNotation)) {
+						project.dependencies.add(configurationName, project.project(":${notationToProjectMapping.get(projectNotation).file.modulePath}"))
+					} else {
+						def notation = [group: dep.groupId, name: dep.artifactId, version: dep.version, classifier: dep.classifier]
+						project.dependencies.add(configurationName, notation) { d ->
+							dep.exclusions.each { exclusion ->
+								d.exclude([group: exclusion.groupId, module: exclusion.artifactId])
+							}
 						}
 					}
 				}
-			}
 
-			pom.getUnsupportedTags().each { tag ->
-				project.logger.lifecycle("Project '${project.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
+				pom.getUnsupportedTags().each { tag ->
+					project.logger.lifecycle("Project '${project.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
+				}
+			} catch (Throwable e) {
+				throw new GradleException("Exception while configuring project '${project.path}'", e)
 			}
 		}
 	}

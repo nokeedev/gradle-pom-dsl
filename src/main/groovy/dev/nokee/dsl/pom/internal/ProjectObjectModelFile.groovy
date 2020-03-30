@@ -32,6 +32,6 @@ class ProjectObjectModelFile {
 		if (p.parent == null) {
 			return ''
 		}
-		return p.parent.toString()
+		return p.parent.toString().replace('/', ':')
 	}
 }

@@ -14,19 +14,21 @@ class ProjectObjectModel {
 	private final ProjectObjectModelFile pomFile
 	private final XmlOptionalWrapper pom
 	private final Project project
+	private final Map<String, ProjectObjectModel> projectRegistry
 
-	private ProjectObjectModel(ProjectObjectModelFile pomFile, Node pom) {
-		this(pomFile, pom, null)
+	private ProjectObjectModel(ProjectObjectModelFile pomFile, Node pom, Map<String, ProjectObjectModel> projectRegistry) {
+		this(pomFile, pom, projectRegistry, null)
 	}
 
-	private ProjectObjectModel(ProjectObjectModelFile pomFile, Node pom, Project project) {
+	private ProjectObjectModel(ProjectObjectModelFile pomFile, Node pom, Map<String, ProjectObjectModel> projectRegistry, Project project) {
 		this.pomFile = pomFile
 		this.pom = new XmlOptionalWrapper(pom)
+		this.projectRegistry = projectRegistry
 		this.project = project
 	}
 
 	ProjectObjectModel attach(Project project) {
-		return new ProjectObjectModel(pomFile, pom.delegate, project)
+		return new ProjectObjectModel(pomFile, pom.delegate, projectRegistry, project)
 	}
 
 	ProjectObjectModelFile getFile() {
@@ -41,8 +43,14 @@ class ProjectObjectModel {
 		return pom.getAsString('packaging').orElse('jar')
 	}
 
+	Optional<ProjectObjectModel> getParent() {
+		return pom.getAsNode('parent').map { new Dependency(new XmlOptionalWrapper(it, false)) }.map {
+			projectRegistry.get("${it.groupId}:${it.artifactId}".toString())
+		}
+	}
+
 	Optional<String> getGroupId() {
-		return pom.getAsString('groupId')
+		return Optional.ofNullable(pom.getAsString('groupId').orElseGet { getParent().flatMap { it.groupId }.orElse(null) })
 	}
 
 	Optional<String> getVersion() {
@@ -62,11 +70,22 @@ class ProjectObjectModel {
 	}
 
 	List<ProjectObjectModel> getModules() {
-		return pom.getAsNode('modules').map { it.children().collect { of(pomFile.module(it.text())) } }.orElse(emptyList())
+		return pom.getAsNode('modules').map { it.children().collect { of(pomFile.module(it.text()), projectRegistry) } }.orElse(emptyList())
+	}
+
+	List<Dependency> getDependencyManagement() {
+		def result = pom.get('dependencyManagement').map {
+			return it.get('dependencies').first().children().collect { new Dependency(new XmlOptionalWrapper(it)) }
+		}.orElse(emptyList())
+
+		if (result.empty) {
+			return getParent().map { it.dependencyManagement }.orElse(emptyList())
+		}
+		return result
 	}
 
 	List<Dependency> getDependencies() {
-		return pom.get('dependencies').map { it.children().collect { n -> new Dependency(new XmlOptionalWrapper(n)) } }.orElse(emptyList())
+		return pom.get('dependencies').map { it.children().collect { new Dependency(new XmlOptionalWrapper(it)) } }.orElse(emptyList())
 	}
 
 	private static final List<String> UNSUPPORTED_TAGS = [
@@ -97,7 +116,7 @@ class ProjectObjectModel {
 		throw new UnsupportedOperationException()
 	}
 
-	static ProjectObjectModel of(ProjectObjectModelFile pomFile) {
+	static ProjectObjectModel of(ProjectObjectModelFile pomFile, Map<String, ProjectObjectModel> projectRegistry) {
 		if (!pomFile.exists()) {
 			throw new IllegalArgumentException("${pomFile.path} file doesn't exists.")
 		}
@@ -111,14 +130,21 @@ class ProjectObjectModel {
 		if (pom.modelVersion.text() != '4.0.0') {
 			throw new IllegalArgumentException("${pomFile.path} file contains an unsupported version for 'modelVersion' (i.e. ${pom.modelVersion.text()}).")
 		}
-		return new ProjectObjectModel(pomFile, pom)
+		return new ProjectObjectModel(pomFile, pom, projectRegistry)
+	}
+
+	@Override
+	String toString() {
+		return "ProjectObjectModel{modulePath=${file.modulePath},artifactId=${artifactId}}"
 	}
 
 
 	class XmlOptionalWrapper {
 		private final Node delegate
+		private final boolean interpolate
 
-		XmlOptionalWrapper(Node delegate) {
+		XmlOptionalWrapper(Node delegate, boolean interpolate = true) {
+			this.interpolate = interpolate
 			this.delegate = delegate
 		}
 
@@ -150,10 +176,13 @@ class ProjectObjectModel {
 		}
 
 		private String toString(String value) {
-			ProjectObjectModel.this.getProperties().each { k, v ->
-				value = value.replace("\${$k}", v)
+			if (interpolate) {
+				ProjectObjectModel.this.getProperties().each { k, v ->
+					value = value.replace("\${$k}", v)
+				}
+				return ProjectObjectModel.this.engine.createTemplate(value).make([project: ProjectObjectModel.this.project])
 			}
-			return ProjectObjectModel.this.engine.createTemplate(value).make([project: ProjectObjectModel.this.project])
+			return value
 		}
 	}
 
@@ -181,7 +210,9 @@ class ProjectObjectModel {
 		}
 
 		String getVersion() {
-			return delegate.getAsString('version').get()
+			return delegate.getAsString('version').orElseGet {
+				ProjectObjectModel.this.dependencyManagement.find { it.groupId == Dependency.this.groupId && it.artifactId == Dependency.this.artifactId }.version
+			}
 		}
 
 		@Nullable
@@ -192,6 +223,12 @@ class ProjectObjectModel {
 		List<Exclusion> getExclusions() {
 			return delegate.get('exclusions').map { it.children().collect { new Exclusion(new XmlOptionalWrapper(it)) } }.orElse(emptyList())
 		}
+
+		@Override
+		String toString() {
+			return "Dependency{groupId=${delegate.getAsString('groupId')},artifactId=${delegate.getAsString('artifactId')}}";
+		}
+
 
 		static class Exclusion {
 			private final XmlOptionalWrapper delegate
