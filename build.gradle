@@ -21,6 +21,10 @@ repositories {
 dependencies {
     compileOnly 'org.codehaus.groovy:groovy-all:2.5.8'
 	compileOnly 'dev.gradleplugins:gradle-api:6.2.2'
+	def lombokVersion = '1.18.12'
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+	implementation 'org.apache.maven:maven-model:3.6.3'
 
 	testImplementation('dev.gradleplugins:gradle-fixtures:latest.integration') {
 		capabilities {

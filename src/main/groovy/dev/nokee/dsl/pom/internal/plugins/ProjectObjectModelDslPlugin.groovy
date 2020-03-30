@@ -1,12 +1,11 @@
 package dev.nokee.dsl.pom.internal.plugins
 
-import dev.nokee.dsl.pom.internal.ProjectObjectModel
-import dev.nokee.dsl.pom.internal.ProjectObjectModelFile
-import org.gradle.api.Action
+import dev.nokee.dsl.pom.internal.EffectiveProjectObjectModel
+import dev.nokee.dsl.pom.internal.MavenModuleLocator
+import dev.nokee.dsl.pom.internal.ProjectObjectModelRegistry
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.XmlProvider
 import org.gradle.api.initialization.Settings
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -14,72 +13,38 @@ import org.gradle.api.publish.maven.MavenPublication
 class ProjectObjectModelDslPlugin implements Plugin<Settings> {
     @Override
     void apply(Settings settings) {
-		def notationToProjectMapping = [:]
-		def pom = ProjectObjectModel.of(new ProjectObjectModelFile(settings.settingsDir, 'pom.xml'), notationToProjectMapping)
-		settings.rootProject.name = pom.artifactId
+		def registry = new ProjectObjectModelRegistry()
+		def allModules = new MavenModuleLocator().locateAllModules(settings.settingsDir)
+			.collect { k, v -> new EffectiveProjectObjectModel(k, v, registry) }
 
-		processModules(settings, pom, notationToProjectMapping)
+		// Register all projects
+		allModules.each {
+			registry.register(it)
+		}
+
+		// Configure the structure
+		settings.rootProject.name = registry.root.artifactId
+		registry.allSubprojects.each { pom ->
+			settings.include(pom.path)
+		}
+		settings.gradle.beforeProject { project ->
+			configureProject(project, registry.forPath(project.path), registry)
+		}
     }
 
-	private void processModules(Settings settings, ProjectObjectModel pom, Map<String, ProjectObjectModel> notationToProjectMapping) {
-		toNotation(pom).ifPresent {
-			notationToProjectMapping.put(it, pom)
-		}
-		pom.modules.each { childPom ->
-			settings.include(childPom.file.modulePath)
-
-			processModules(settings, childPom, notationToProjectMapping)
-		}
-		settings.gradle.rootProject { project ->
-			project.project(":${pom.file.modulePath}", configureProject(pom, notationToProjectMapping))
-		}
-	}
-
-	private Action<XmlProvider> copy(ProjectObjectModel pom) {
-		return new Action<XmlProvider>() {
-			@Override
-			void execute(XmlProvider xmlProvider) {
-				pom.getNode('name').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('url').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('inceptionYear').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('ciManagement').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('contributors').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('organization').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('scm').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('mailingLists').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('developers').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('licenses').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('issueManagement').ifPresent { xmlProvider.asNode().append(it) }
-				pom.getNode('properties').ifPresent {xmlProvider.asNode().append(it) }
-			}
-		}
-	}
-
-	private Optional<String> toNotation(ProjectObjectModel pom) {
-		if (pom.groupId.present) {
-			return Optional.of(String.format("%s:%s", pom.groupId.get(), pom.artifactId))
-		}
-		return Optional.empty()
-	}
-
-	private Action<Project> configureProject(ProjectObjectModel unattachedPom, Map<String, ProjectObjectModel> notationToProjectMapping) {
-		return { project ->
+	private void configureProject(Project project, EffectiveProjectObjectModel pom, ProjectObjectModelRegistry registry) {
 			try {
-				ProjectObjectModel pom = unattachedPom.attach(project)
 				// Configure basic information
-				pom.groupId.ifPresent {
-					project.ext.groupId = it
-					project.group = it
-				}
-				project.ext.artifactId = project.name
-				pom.version.ifPresent { project.version = it }
+				// FIXME: Setting the group cause Gradle to create loops inside the same project... completely awful... especially after 8h+ of debugging
+//				project.group = pom.groupId
+				project.version = pom.version
 				pom.description.ifPresent { project.description = it }
 
 				// Always apply maven publishing plugin
 				project.pluginManager.apply('maven-publish')
 				project.extensions.configure(PublishingExtension) { publishing ->
 					publishing.publications.withType(MavenPublication).all { MavenPublication publication ->
-						publication.pom.withXml(copy(pom))
+						publication.pom.withXml { pom.copyTo(it) }
 					}
 				}
 
@@ -91,6 +56,9 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 					project.extensions.configure(PublishingExtension) { publishing ->
 						publishing.publications.create('maven', MavenPublication) {
 							it.from(project.components.java)
+
+							// Configuring the groupId here because of the issue above
+							it.groupId = pom.groupId
 						}
 					}
 				} else if (pom.packaging == 'ear') {
@@ -107,6 +75,8 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				}
 
 				// Map properties to extra properties
+				project.ext.groupId = pom.groupId
+				project.ext.artifactId = pom.artifactId
 				pom.properties.each { k, v ->
 					project.ext."$k" = v
 				}
@@ -114,22 +84,24 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				// Map dependencies
 				pom.dependencies.each { dep ->
 					def configurationName = null
-					if (dep.scope == 'compile') {
+					def scope = Optional.ofNullable(dep.scope).orElse('compile')
+					if (scope == 'compile') {
 						configurationName = 'compile'
-					} else if (dep.scope == 'runtime') {
+					} else if (scope == 'runtime') {
 						configurationName = 'runtimeOnly'
-					} else if (dep.scope == 'provided') {
+					} else if (scope == 'provided') {
 						configurationName = 'compileOnly'
-					} else if (dep.scope == 'test') {
+					} else if (scope == 'test') {
 						configurationName = 'testImplementation'
 					} else {
-						project.logger.lifecycle("Project '${project.path}' use an unsupported dependency scope (i.e. ${dep.groupId}:${dep.artifactId}:${dep.version} for ${dep.scope})")
+						project.logger.lifecycle("Project '${project.path}' use an unsupported dependency scope (i.e. ${dep.groupId}:${dep.artifactId}:${dep.version} for ${scope})")
 						return
 					}
 
-					def projectNotation = String.format("%s:%s", dep.groupId, dep.artifactId)
-					if (notationToProjectMapping.containsKey(projectNotation)) {
-						project.dependencies.add(configurationName, project.project(":${notationToProjectMapping.get(projectNotation).file.modulePath}"))
+					def projectNotation = String.format('%s:%s:%s', dep.groupId, dep.artifactId, dep.version)
+					if (registry.has(projectNotation)) {
+						def proj = registry.get(projectNotation)
+						project.dependencies.add(configurationName, project.project(proj.path))
 					} else {
 						def notation = [group: dep.groupId, name: dep.artifactId, version: dep.version, classifier: dep.classifier]
 						project.dependencies.add(configurationName, notation) { d ->
@@ -139,13 +111,12 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 						}
 					}
 				}
-
-				pom.getUnsupportedTags().each { tag ->
-					project.logger.lifecycle("Project '${project.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
-				}
+//
+//				pom.getUnsupportedTags().each { tag ->
+//					project.logger.lifecycle("Project '${project.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
+//				}
 			} catch (Throwable e) {
 				throw new GradleException("Exception while configuring project '${project.path}'", e)
 			}
-		}
 	}
 }

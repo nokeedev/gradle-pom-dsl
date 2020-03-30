@@ -13,7 +13,7 @@ class ProjectObjectModelIntegrityFunctionalTest extends AbstractProjectObjectMod
 		fails('help')
 		failure.assertHasDescription("An exception occurred applying plugin request [id: 'dev.nokee.pom-dsl']")
 		failure.assertHasCause("Failed to apply plugin [id 'dev.nokee.pom-dsl']")
-		failure.assertHasCause("pom.xml file contains an unsupported version for 'modelVersion' (i.e. 3.0.0).")
+		failure.assertHasCause("pom.xml file contains an unsupported version for 'modelVersion' (i.e. 3.0.0)")
 	}
 
 	def "asserts the pom.xml has modelVersion tag"() {
@@ -27,20 +27,6 @@ class ProjectObjectModelIntegrityFunctionalTest extends AbstractProjectObjectMod
 		fails('help')
 		failure.assertHasDescription("An exception occurred applying plugin request [id: 'dev.nokee.pom-dsl']")
 		failure.assertHasCause("Failed to apply plugin [id 'dev.nokee.pom-dsl']")
-		failure.assertHasCause("pom.xml file doesn't have a 'modelVersion' tag.")
-	}
-
-	def "asserts the pom.xml has project root tag"() {
-		pomFile << """
-			<foo>
-				<artifactId>my-app</artifactId>
-			</foo>
-		"""
-
-		expect:
-		fails('help')
-		failure.assertHasDescription("An exception occurred applying plugin request [id: 'dev.nokee.pom-dsl']")
-		failure.assertHasCause("Failed to apply plugin [id 'dev.nokee.pom-dsl']")
-		failure.assertHasCause("pom.xml file doesn't have a 'project' root tag (i.e. foo).")
+		failure.assertHasCause("pom.xml file doesn't have a 'modelVersion' tag")
 	}
 }
