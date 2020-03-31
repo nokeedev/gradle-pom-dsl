@@ -56,6 +56,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 					project.extensions.configure(PublishingExtension) { publishing ->
 						publishing.publications.create('maven', MavenPublication) {
 							it.from(project.components.java)
+							it.artifactId = pom.artifactId
 
 							// Configuring the groupId here because of the issue above
 							it.groupId = pom.groupId
