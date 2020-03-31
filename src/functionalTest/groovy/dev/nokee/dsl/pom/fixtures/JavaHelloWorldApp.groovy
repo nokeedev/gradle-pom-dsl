@@ -5,7 +5,6 @@ import dev.gradleplugins.test.fixtures.sources.SourceElement
 import dev.gradleplugins.test.fixtures.sources.SourceFile
 import dev.gradleplugins.test.fixtures.sources.SourceFileElement
 import dev.gradleplugins.test.fixtures.sources.java.JavaSourceElement
-import dev.gradleplugins.test.fixtures.sources.java.JavaSourceFileElement
 
 import static dev.gradleplugins.test.fixtures.sources.SourceFileElement.ofFile
 

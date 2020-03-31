@@ -1,13 +1,7 @@
 package dev.nokee.dsl.pom.internal
 
-import groovy.transform.Immutable
-import lombok.Value
-import lombok.With
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
-import org.gradle.maven.MavenModule
-
-import java.nio.file.Path
 
 class MavenModuleLocator {
 	Map<String, Model> locateAllModules(File rootDirectory) {

@@ -3,14 +3,11 @@ package dev.nokee.dsl.pom.internal
 import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import groovy.xml.QName
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.gradle.api.XmlProvider
 
 import java.util.function.Function
-
-import static java.util.Collections.emptyList
 
 @CompileStatic
 class EffectiveProjectObjectModel {
