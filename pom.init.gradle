@@ -9,6 +9,9 @@ initscript {
 	}
 }
 
+// Trust me, don't search for parent settings.gradle[.kts]
+gradle.startParameter.searchUpwards = false
+
 settingsEvaluated { settings ->
 	settings.pluginManager.apply(dev.nokee.PomDslPlugin)
 }
