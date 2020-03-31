@@ -50,9 +50,10 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 
 				// Apply plugins based on packaging
 				if (pom.packaging == 'war') {
+					project.pluginManager.apply('java-library') // for the api configuration
 					project.pluginManager.apply('war')
 				} else if (pom.packaging == 'jar') {
-					project.pluginManager.apply('java')
+					project.pluginManager.apply('java-library') // for the api configuration instead of using the java plugin
 					project.extensions.configure(PublishingExtension) { publishing ->
 						publishing.publications.create('maven', MavenPublication) {
 							it.from(project.components.java)
@@ -63,6 +64,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 						}
 					}
 				} else if (pom.packaging == 'ear') {
+					project.pluginManager.apply('java-library') // for the api configuration
 					project.pluginManager.apply('ear')
 				} else if (pom.packaging == 'pom') {
 					// ignore pom packaging
@@ -87,7 +89,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 					def configurationName = null
 					def scope = Optional.ofNullable(dep.scope).orElse('compile')
 					if (scope == 'compile') {
-						configurationName = 'compile'
+						configurationName = 'api'
 					} else if (scope == 'runtime') {
 						configurationName = 'runtimeOnly'
 					} else if (scope == 'provided') {

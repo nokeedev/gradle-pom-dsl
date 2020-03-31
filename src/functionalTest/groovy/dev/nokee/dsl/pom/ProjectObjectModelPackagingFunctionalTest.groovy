@@ -36,7 +36,7 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 		buildFile << """
 			tasks.register('verify') {
 				doLast {
-					assert pluginManager.hasPlugin('java')
+					assert pluginManager.hasPlugin('java-library')
 					assert !pluginManager.hasPlugin('war')
 					assert !pluginManager.hasPlugin('ear')
 				}
@@ -54,7 +54,6 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 			tasks.register('verify') {
 				doLast {
 					assert pluginManager.hasPlugin('ear')
-					assert !pluginManager.hasPlugin('java')
 					assert !pluginManager.hasPlugin('war')
 				}
 			}
@@ -94,7 +93,7 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 		buildFile << """
 			tasks.register('verify') {
 				doLast {
-					assert pluginManager.hasPlugin('java')
+					assert pluginManager.hasPlugin('java-library')
 					assert !pluginManager.hasPlugin('war')
 					assert !pluginManager.hasPlugin('ear')
 				}
