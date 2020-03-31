@@ -45,6 +45,10 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				project.extensions.configure(PublishingExtension) { publishing ->
 					publishing.publications.withType(MavenPublication).all { MavenPublication publication ->
 						publication.pom.withXml { pom.copyTo(it) }
+						publication.artifactId = pom.artifactId
+
+						// Configuring the groupId here because of the issue above
+						publication.groupId = pom.groupId
 					}
 				}
 
@@ -57,10 +61,6 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 					project.extensions.configure(PublishingExtension) { publishing ->
 						publishing.publications.create('jar', MavenPublication) {
 							it.from(project.components.java)
-							it.artifactId = pom.artifactId
-
-							// Configuring the groupId here because of the issue above
-							it.groupId = pom.groupId
 						}
 					}
 				} else if (pom.packaging == 'ear') {
@@ -68,6 +68,9 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 					project.pluginManager.apply('ear')
 				} else if (pom.packaging == 'pom') {
 					// ignore pom packaging
+					project.extensions.configure(PublishingExtension) { publishing ->
+						publishing.publications.create('pom', MavenPublication)
+					}
 				} else {
 					project.logger.lifecycle("Project '${project.path}' use an unsupported packaging (i.e. ${pom.packaging}), future version may support it.")
 				}
