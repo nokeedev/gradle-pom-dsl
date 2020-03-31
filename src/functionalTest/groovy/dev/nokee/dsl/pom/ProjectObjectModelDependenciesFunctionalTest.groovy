@@ -48,7 +48,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>pom</packaging>
-	<groupId>com.in28minutes.example.layering</groupId>
+	<groupId>com.example.maven.layering</groupId>
 	<artifactId>parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>${project.artifactId}</name>
@@ -178,27 +178,27 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 			</dependency>
 
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-model</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-data-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-data-impl</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-business-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-business-impl</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -224,7 +224,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-	    <groupId>com.in28minutes.example.layering</groupId>
+	    <groupId>com.example.maven.layering</groupId>
     	<artifactId>parent</artifactId>
     	<version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -244,7 +244,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-	    <groupId>com.in28minutes.example.layering</groupId>
+	    <groupId>com.example.maven.layering</groupId>
     	<artifactId>in28minutes-multi-module-business</artifactId>
     	<version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -256,7 +256,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 
     <dependencies>
 		<dependency>
-            <groupId>com.in28minutes.example.layering</groupId>
+            <groupId>com.example.maven.layering</groupId>
             <artifactId>in28minutes-multi-module-data-api</artifactId>
 		</dependency>
     </dependencies>
@@ -266,7 +266,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-	    <groupId>com.in28minutes.example.layering</groupId>
+	    <groupId>com.example.maven.layering</groupId>
     	<artifactId>parent</artifactId>
     	<version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -285,7 +285,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-	    <groupId>com.in28minutes.example.layering</groupId>
+	    <groupId>com.example.maven.layering</groupId>
     	<artifactId>in28minutes-multi-module-data</artifactId>
     	<version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -319,7 +319,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>pom</packaging>
-	<groupId>com.in28minutes.example.layering</groupId>
+	<groupId>com.example.maven.layering</groupId>
 	<artifactId>parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>${project.artifactId}</name>
@@ -449,27 +449,27 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 			</dependency>
 
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-model</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-data-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-data-impl</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-business-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>in28minutes-multi-module-business-impl</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -495,7 +495,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-	    <groupId>com.in28minutes.example.layering</groupId>
+	    <groupId>com.example.maven.layering</groupId>
     	<artifactId>parent</artifactId>
     	<version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -507,7 +507,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 
     <dependencies>
 		<dependency>
-            <groupId>com.in28minutes.example.layering</groupId>
+            <groupId>com.example.maven.layering</groupId>
             <artifactId>in28minutes-multi-module-data-api</artifactId>
 		</dependency>
     </dependencies>
@@ -517,7 +517,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-	    <groupId>com.in28minutes.example.layering</groupId>
+	    <groupId>com.example.maven.layering</groupId>
     	<artifactId>parent</artifactId>
     	<version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -532,7 +532,7 @@ class ProjectObjectModelDependenciesFunctionalTest extends AbstractProjectObject
 //    <modelVersion>4.0.0</modelVersion>
 //
 //    <parent>
-//	    <groupId>com.in28minutes.example.layering</groupId>
+//	    <groupId>com.example.maven.layering</groupId>
 //    	<artifactId>in28minutes-multi-module-data</artifactId>
 //    	<version>0.0.1-SNAPSHOT</version>
 //    </parent>

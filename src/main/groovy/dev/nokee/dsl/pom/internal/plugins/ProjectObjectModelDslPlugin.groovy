@@ -111,10 +111,6 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 						}
 					}
 				}
-//
-//				pom.getUnsupportedTags().each { tag ->
-//					project.logger.lifecycle("Project '${project.path}' use an unsupported tag (i.e. ${tag}), future version may support it.")
-//				}
 			} catch (Throwable e) {
 				throw new GradleException("Exception while configuring project '${project.path}'", e)
 			}

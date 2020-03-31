@@ -56,7 +56,7 @@ class ProjectObjectModelPropertiesFunctionalTest extends AbstractProjectObjectMo
 				xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 				<modelVersion>4.0.0</modelVersion>
 				<packaging>pom</packaging>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>parent</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 				<description>This pom acts as the parent pom for the entire project (name: \${project.artifactId}).</description>
@@ -80,7 +80,7 @@ class ProjectObjectModelPropertiesFunctionalTest extends AbstractProjectObjectMo
 				xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 				<modelVersion>4.0.0</modelVersion>
 				<packaging>pom</packaging>
-				<groupId>com.in28minutes.example.layering</groupId>
+				<groupId>com.example.maven.layering</groupId>
 				<artifactId>parent</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 				<description>Value is \${spring-core-version}</description>
