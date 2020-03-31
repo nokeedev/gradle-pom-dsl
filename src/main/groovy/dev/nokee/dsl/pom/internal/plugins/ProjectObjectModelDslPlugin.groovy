@@ -55,7 +55,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 				} else if (pom.packaging == 'jar') {
 					project.pluginManager.apply('java-library') // for the api configuration instead of using the java plugin
 					project.extensions.configure(PublishingExtension) { publishing ->
-						publishing.publications.create('maven', MavenPublication) {
+						publishing.publications.create('jar', MavenPublication) {
 							it.from(project.components.java)
 							it.artifactId = pom.artifactId
 
