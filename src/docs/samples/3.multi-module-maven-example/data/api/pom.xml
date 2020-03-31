@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+	    <groupId>com.example.maven.layering</groupId>
+    	<artifactId>example-multi-module-data</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <packaging>jar</packaging>
+    <artifactId>example-multi-module-data-api</artifactId>
+    <name>${project.artifactId}</name>
+    <description>Data Access API.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.example.maven.layering</groupId>
+            <artifactId>example-multi-module-model</artifactId>
+        </dependency>
+    </dependencies>
+</project>
