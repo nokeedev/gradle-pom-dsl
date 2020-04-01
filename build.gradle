@@ -25,7 +25,7 @@ repositories {
 sourceSets {
 	docsTest
 }
-tasks.register("docsTest", Test) {
+def docsTest = tasks.register("docsTest", Test) {
 	dependsOn('publishToMavenLocal')
 	group = LifecycleBasePlugin.VERIFICATION_GROUP
 	classpath = sourceSets.docsTest.runtimeClasspath
@@ -34,6 +34,7 @@ tasks.register("docsTest", Test) {
 configurations {
 	docsTestImplementation.extendsFrom(testImplementation)
 }
+tasks.named('check') { dependsOn docsTest }
 
 dependencies {
     compileOnly 'org.codehaus.groovy:groovy-all:2.5.8'
