@@ -3,9 +3,15 @@ package dev.nokee.dsl.pom.internal
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 
+import static java.util.Collections.emptyMap
+
 class MavenModuleLocator {
 	Map<String, Model> locateAllModules(File rootDirectory) {
-		return processModules(locateRootModule(rootDirectory), '')
+		File rootPomFile = locateRootModule(rootDirectory)
+		if (rootPomFile.exists()) {
+			return processModules(rootPomFile, '')
+		}
+		return emptyMap()
 	}
 
 	private File locateRootModule(File rootDirectory) {

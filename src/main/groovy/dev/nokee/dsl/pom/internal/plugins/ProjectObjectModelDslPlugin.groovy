@@ -17,18 +17,20 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 		def allModules = new MavenModuleLocator().locateAllModules(settings.settingsDir)
 			.collect { k, v -> new EffectiveProjectObjectModel(k, v, registry) }
 
-		// Register all projects
-		allModules.each {
-			registry.register(it)
-		}
+		if (!allModules.empty) {
+			// Register all projects
+			allModules.each {
+				registry.register(it)
+			}
 
-		// Configure the structure
-		settings.rootProject.name = registry.root.artifactId
-		registry.allSubprojects.each { pom ->
-			settings.include(pom.path)
-		}
-		settings.gradle.beforeProject { project ->
-			configureProject(project, registry.forPath(project.path), registry)
+			// Configure the structure
+			settings.rootProject.name = registry.root.artifactId
+			registry.allSubprojects.each { pom ->
+				settings.include(pom.path)
+			}
+			settings.gradle.beforeProject { project ->
+				configureProject(project, registry.forPath(project.path), registry)
+			}
 		}
     }
 
