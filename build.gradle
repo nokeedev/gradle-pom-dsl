@@ -8,6 +8,7 @@ plugins {
 	id 'com.jfrog.bintray' version '1.8.4'
 }
 
+description = 'Feeling nostalgic? Try the Maven pom.xml DSL for Gradle'
 group = 'dev.nokee'
 version = '1.0'
 
