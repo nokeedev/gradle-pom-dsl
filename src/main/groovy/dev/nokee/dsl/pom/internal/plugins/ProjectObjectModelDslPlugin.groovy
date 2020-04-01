@@ -68,6 +68,7 @@ class ProjectObjectModelDslPlugin implements Plugin<Settings> {
 					project.pluginManager.apply('ear')
 				} else if (pom.packaging == 'pom') {
 					// ignore pom packaging
+					project.pluginManager.apply('base')
 					project.extensions.configure(PublishingExtension) { publishing ->
 						publishing.publications.create('pom', MavenPublication)
 					}

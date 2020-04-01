@@ -64,11 +64,12 @@ class ProjectObjectModelPackagingFunctionalTest extends AbstractProjectObjectMod
 		!result.output.contains("Project ':' use an unsupported packaging")
 	}
 
-	def "does not applies any plugin for packaging pom"() {
+	def "applies the core base plugin for packaging pom"() {
 		makeSingleProject('pom')
 		buildFile << """
 			tasks.register('verify') {
 				doLast {
+					assert pluginManager.hasPlugin('base')
 					assert !pluginManager.hasPlugin('ear')
 					assert !pluginManager.hasPlugin('java')
 					assert !pluginManager.hasPlugin('war')
