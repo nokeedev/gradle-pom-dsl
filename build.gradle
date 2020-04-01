@@ -1,6 +1,11 @@
+import com.sun.istack.internal.Nullable
+
+import java.text.SimpleDateFormat
+
 plugins {
     id 'dev.gradleplugins.groovy-gradle-plugin'
 	id 'maven-publish'
+	id 'com.jfrog.bintray' version '1.8.4'
 }
 
 group = 'dev.nokee'
@@ -57,4 +62,48 @@ gradlePlugin {
             implementationClass = 'dev.nokee.dsl.pom.internal.plugins.ProjectObjectModelDslPlugin'
         }
     }
+}
+
+@Nullable
+private String resolveProperty(Project project, String envVarKey, String projectPropKey) {
+	Object propValue = System.getenv().get(envVarKey);
+
+	if (propValue != null) {
+		return propValue.toString();
+	}
+
+	propValue = project.findProperty(projectPropKey);
+	if (propValue != null) {
+		return propValue.toString();
+	}
+
+	return null;
+}
+
+afterEvaluate {
+	bintray {
+		user = resolveProperty(project, "BINTRAY_USER", "dev.nokee.bintray.user")
+		key = resolveProperty(project, "BINTRAY_KEY", "dev.nokee.bintray.key")
+		publications = publishing.publications.collect { it.name }
+
+		publish = true
+		override = false
+		pkg {
+			repo = 'distributions'
+			name = 'dev.nokee:gradle-pom-dsl'
+			desc = project.description
+			userOrg = 'nokeedev'
+			websiteUrl = 'https://nokee.dev/blog/maven-pom-dsl'
+			issueTrackerUrl = 'https://github.com/nokeedev/gradle-pom-dsl/issues'
+			vcsUrl = 'https://github.com/nokeedev/gradle-pom-dsl.git'
+			labels = ['gradle', 'pom', 'maven', 'pom-dsl']
+			licenses = ['MIT']
+			publicDownloadNumbers = false
+
+			version {
+				attributes = ['gradle-plugin': ["dev.nokee.pom-dsl:${project.group}:${project.name}"]]
+				released = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").format(new Date())
+			}
+		}
+	}
 }
