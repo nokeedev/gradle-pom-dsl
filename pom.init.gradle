@@ -5,7 +5,7 @@ initscript {
 		maven { url = 'https://dl.bintray.com/nokeedev/distributions' }
 	}
 	dependencies {
-		classpath 'dev.nokee:pom-dsl-gradle-plugin:latest.integration'
+		classpath 'dev.nokee:gradle-pom-dsl:latest.integration'
 	}
 }
 
