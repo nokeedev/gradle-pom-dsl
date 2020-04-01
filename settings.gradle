@@ -13,4 +13,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'pom-dsl-gradle-plugin'
+rootProject.name = 'gradle-pom-dsl'
