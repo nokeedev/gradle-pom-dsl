@@ -1,0 +1,33 @@
+= Gradle's Ultimate DSL: The Maven pom.xml
+
+Are you feeling nostalgic?
+Do you remember a time when you wrote your build configuration in XML?
+Search no more!
+
+Turn your Gradle build configuration into simple pom.xml files.
+This Gradle plugin will add support for the Maven Project Object Model (POM) DSL.
+You are not dreaming; THIS IS FOR REAL.
+
+== Getting Started
+
+Simply download the link:pom.init.gradle[init script] into `~/.gradle/init.d` and start executing Gradle inside Maven projects.
+
+CAUTION: We recommend you use `--init-script` or `-I` flag instead of the global init script folder.
+
+== But, why?
+
+Because.
+Read the https://nokee.dev/blog/maven-pom-dsl/[announcement blog post], where you can see the plugin in action.
+You can also try you link:src/docs/samples/README.adoc[the samples over here].
+
+== How to contribute?
+
+Open issues, submit PR, go wild!
+
+== License
+
+MIT, as I said, go wild!
+
+== Author
+
+https://twitter.com/lacasseio[Daniel Lacasse]

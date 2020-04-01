@@ -1,0 +1,7 @@
+= Samples
+
+Read more about the plugin in the link:../../../README.adoc[project's read me].
+
+- link:1.basic-maven-example/pom.xml[Basic Maven Example]: A single Java project with JUnit tests.
+- link:2.intermediate-maven-example/pom.xml[Intermediate Maven Example]: A single Java project showing dependency exclusions.
+- link:3.multi-module-maven-example/pom.xml[Multi-module Maven Example]: A multi-module Java project with JUnit tests and parent POMs.
